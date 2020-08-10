@@ -193,9 +193,7 @@ samtools view -bu -f 12 -F 256 /data2/home/lichunhui/human_stool/02_minimap2/SRR
 #生成fastq文件
 bedtools bamtofastq -i /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_sort.bam -fq SRR8427257_meta.fastq
 
-#使用kraken2对质控后的reads进行注释
-cd /data2/home/lichunhui/human_stool/03_read_kraken2
-nohup time sh read_kraken2.sh > read_kraken2.log 2>&1 &
+
 #canu组装genomesize=4.8m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
@@ -206,6 +204,9 @@ cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu50m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_50m/SRR8427257.contigs.fasta
+#canu组装genosize=100m
+cd /data2/home/lichunhui/human_stool/04_assemble
+nohup time sh canu.sh 2>&1 &
 
 
 #flye组装genomesize=1.2g
@@ -215,7 +216,25 @@ nohup time sh flye.sh > flye.log 2>&1 &
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye/assembly.fasta
 #flye组装genosize=100m
 cd /data2/home/lichunhui/human_stool/04_assemble
-nohup time sh flye.sh > flye.log 2>&1 &
+nohup time sh flye.sh > flye_100m.log 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye100m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye_100m/assembly.fasta
+#flye组装genomesize=250m
+cd /data2/home/lichunhui/human_stool/04_assemble
+nohup time sh flye.sh > flye_250m.log 2>&1 &
 
+
+#使用kraken2对质控后的reads进行注释
+cd /data2/home/lichunhui/human_stool/03_read_kraken2
+nohup time sh read_kraken2.sh > read_kraken2.log 2>&1 &
+
+
+#查看统计信息
+cd /data2/home/lichunhui/human_stool/02_minimap2
+samtools flagstat SRR8427257.bam
+#修改flag值再提取没有比对上的序列
+samtools view -bu -f 4 SRR8427257.bam > SRR8427257_unmap.bam
+#sort排序
+samtools sort SRR8427257_unmap.bam -o SRR8427257_unmap_sort.bam
+#得到fastq文件
+bedtools bamtofastq -i /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_unmap_sort.bam -fq SRR8427257_meta1.fastq
