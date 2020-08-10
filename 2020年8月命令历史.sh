@@ -91,7 +91,7 @@ wget https://github.com/eggnogdb/eggnog-mapper/archive/1.0.3.tar.gz -O ~/softwar
 tar zxf ~/software/eggnog-mapper-1.0.3.tar.gz -C /data2/home/lichunhui/database/eggnog/
 cd /data2/home/lichunhui/database/eggnog/eggnog-mapper-1.0.3
 nohup python download_eggnog_data.py -y -f euk bact arch viruses > log.log 2>&1 & #下载不完整，出错
-nohup ./download_eggnog_data.py euk bact arch viruses > log.log 2>&1 & #换成这个下载命令
+nohup ./download_eggnog_data.py euk bact arch viruses > log.log 2>&1 & #换成这个下载命令,还是下载不了，缺文件，气死人，不用1.0版本了
 
 #使用eggnog-mapper进行注释,默认基于hmmer
 nohup python /data2/home/lichunhui/database/eggnog/eggnog-mapper-1.0.3/emapper.py -d bact -i /data2/home/lichunhui/lunfish_meta/Dormancy/06_megahit_zz/dormancy.fa --data_dir /data2/home/yanxiaoting/biosoft/eggnog-mapper/eggnog-mapper-1.0.3/data -o eggNOG_hmmer --cpu 20 --no_file_comments --translate > log.log 2>&1 &
@@ -129,7 +129,7 @@ tar -xvf *.tar.gz
 rm *.gz
 
 concoct的分箱出现了问题，尝试单独运行concoct来得到结果
-
+concoct单独运行也出现了问题
 
 
 
