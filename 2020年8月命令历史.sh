@@ -186,21 +186,36 @@ NanoFilt /data2/home/lichunhui/human_stool/SRR8427257/SRR8427257.fastq -l 1000 -
 fastqc -o /data2/home/lichunhui/human_stool/01_nanofilt/ -t 10 /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq
 #使用minimap2比对到人类参考基因组上，去除宿主污染
 nohup time sh /data2/home/lichunhui/human_stool/02_minimap2/minimap.sh > /data2/home/lichunhui/human_stool/02_minimap2/minimap2.log 2>&1 &
+
+#提取出没有比对到参考基因组上的结果
+samtools view -bu -f 12 -F 256 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257.bam > /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_unmap.bam
+
 #生成fastq文件
 bedtools bamtofastq -i /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_sort.bam -fq SRR8427257_meta.fastq
+
 #使用kraken2对质控后的reads进行注释
 cd /data2/home/lichunhui/human_stool/03_read_kraken2
 nohup time sh read_kraken2.sh > read_kraken2.log 2>&1 &
-#canu组装
+#canu组装genomesize=4.8m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
-#canu组装出的congtig的质量评估
+#质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu/SRR8427257.contigs.fasta
-#flye组装genomesize=1.2g
+#canu组装genomesize=50m
 cd /data2/home/lichunhui/human_stool/04_assemble
-nohup time sh flye.sh > flye.log 2>&1 &
-#修改genosize=100m
+nohup time sh canu.sh 2>&1 &
+#质量评估
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu50m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_50m/SRR8427257.contigs.fasta
+
+
+#flye组装genomesize=1.2g
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh flye.sh > flye.log 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye/assembly.fasta
+#flye组装genosize=100m
+cd /data2/home/lichunhui/human_stool/04_assemble
+nohup time sh flye.sh > flye.log 2>&1 &
+#质量评估
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye100m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye_100m/assembly.fasta
+
