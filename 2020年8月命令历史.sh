@@ -196,6 +196,11 @@ cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
 #canu组装出的congtig的质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu/SRR8427257.contigs.fasta
-#flye组装
+#flye组装genomesize=1.2g
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh flye.sh > flye.log 2>&1 &
+#修改genosize=100m
+cd /data2/home/lichunhui/human_stool/04_assemble
+nohup time sh flye.sh > flye.log 2>&1 &
+#质量评估
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye/assembly.fasta
