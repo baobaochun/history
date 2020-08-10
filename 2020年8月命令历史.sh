@@ -199,14 +199,18 @@ cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu/SRR8427257.contigs.fasta
+
 #canu组装genomesize=50m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu50m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_50m/SRR8427257.contigs.fasta
+
 #canu组装genosize=100m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh canu.sh 2>&1 &
+#质量评估
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/canu100m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta
 
 
 #flye组装genomesize=1.2g
@@ -214,14 +218,18 @@ cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh flye.sh > flye.log 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye/assembly.fasta
+
 #flye组装genosize=100m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh flye.sh > flye_100m.log 2>&1 &
 #质量评估
 python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye100m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye_100m/assembly.fasta
+
 #flye组装genomesize=250m
 cd /data2/home/lichunhui/human_stool/04_assemble
 nohup time sh flye.sh > flye_250m.log 2>&1 &
+#质量评估
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye250m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_flye_250m/assembly.fasta
 
 
 #使用kraken2对质控后的reads进行注释

@@ -24,3 +24,13 @@ diamond 2.0.1
 metawrap
 python=2.7.15
 由于软件metawrap是一个综合的宏基因组分析流程，因此依赖的软件包较多，但是我只使用其中的分箱注释流程和其中的checkM进行分箱的评估
+
+nanopore
+python=3.7.8
+专门进行三代宏基因组数据分析的conda环境
+软件列表
+canu 2.0
+flye 2.8
+nanofilt 2.7.1
+samtools 1.7
+quickmerge 0.3
