@@ -1,0 +1,26 @@
+各个conda环境使用说明
+
+base 
+python=3.7.6
+base是conda基础环境，我在这个环境中安装了挺多基于python3.7的二代测序数据处理的软件,大部分对二代数据的处理都会在这个conda环境中
+软件列表
+bedtools 2.29.2
+bwa 0.7.17
+cd-hit 4.8.1
+diamond 2.0.1
+fastqc 0.11.9
+megahit 1.2.9
+prodigal 2.6.3
+samtools 1.10
+trimmomatic 0.39
+
+eggnog
+python=2.7.15
+eggnog 是为了配合eggnog-mapper这个软件而安装的环境，eggnog-mapper这个软件是在本地进行的安装，路径是/data2/home/lichunhui/database/eggnog，有v1和v2两个版本,eggnog-mapper v1这个软件依赖HMMER3和DIAMOND这两个包，如果没有在conda环境中进行安装，eggnog-mapper也会调用自带的HMMER和DIAMOND。
+软件列表
+biopython 1.76
+diamond 2.0.1
+
+metawrap
+python=2.7.15
+由于软件metawrap是一个综合的宏基因组分析流程，因此依赖的软件包较多，但是我只使用其中的分箱注释流程
