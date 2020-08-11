@@ -176,6 +176,7 @@ tar xzvf sratoolkit.2.10.8-centos_linux64.tar.gz
 cd /data2/home/lichunhui/human_stool/SRR8427257/
 /public/home/lichunhui/software/sratoolkit.2.10.8-centos_linux64/bin/fastq-dump SRR8427257.sra
 
+
 #先用fastqc查看序列质量，再找找有没有专门进行3代测序数据评估的软件
 fastqc -o /data2/home/lichunhui/human_stool/00_fastqc/ -t 10 /data2/home/lichunhui/human_stool/SRR8427257/SRR8427257.fastq
 #创建新的conda环境
@@ -235,14 +236,43 @@ python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/h
 #使用kraken2对质控后的reads进行注释
 cd /data2/home/lichunhui/human_stool/03_read_kraken2
 nohup time sh read_kraken2.sh > read_kraken2.log 2>&1 &
+#提取注释结果
+python /public/home/lichunhui/project/lungfish_meta/kraken2_annotation.py /data2/home/lichunhui/human_stool/03_read_kraken2/ /data2/home/lichunhui/human_stool/03_read_kraken2/
+
+#使用kraken2对组装后的contigs进行注释
+cd /data2/home/lichunhui/human_stool/05_congtig_kraken2
+nohup time sh contig_kraken2.sh > contig_kraken2.log 2>&1 &
 
 
 #查看统计信息
 cd /data2/home/lichunhui/human_stool/02_minimap2
 samtools flagstat SRR8427257.bam
+
 #修改flag值再提取没有比对上的序列
 samtools view -bu -f 4 SRR8427257.bam > SRR8427257_unmap.bam
 #sort排序
 samtools sort SRR8427257_unmap.bam -o SRR8427257_unmap_sort.bam
 #得到fastq文件
 bedtools bamtofastq -i /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_unmap_sort.bam -fq SRR8427257_meta1.fastq
+
+
+
+#2020/08/11
+#使用v2.0 eggnog-mapper对粪便数据进行注释
+cd /data2/home/lichunhui/human_stool/06_eggnog
+nohup eggnog.sh > eggnog.log 2>&1 &
+
+#重新用minimap2进行比对生成sam文件
+cd /data2/home/lichunhui/human_stool/02_minimap2
+nohup minimap2 -ax map-ont /public/home/renqingmiao2018/project/yak.rumen.metagenome/00.ref/human.genome/GCF_000001405.38_GRCh38.p12_genomic.fna /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq -t 24 > SRR8427257.sam &
+
+#安装nextpolish
+cd software/
+git clone --recursive https://github.com/jts/nanopolish.git
+
+#racon抛光
+cd /data2/home/lichunhui/human_stool/07_racon
+racon -m 8 -x -6 -g -8 -t 12 \
+/data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq \
+/data2/home/lichunhui/human_stool/02_minimap2/SRR8427257.sam \
+/data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta
