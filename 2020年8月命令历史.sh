@@ -262,9 +262,10 @@ bedtools bamtofastq -i /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_
 cd /data2/home/lichunhui/human_stool/06_eggnog
 nohup eggnog.sh > eggnog.log 2>&1 &
 
-#重新用minimap2进行比对生成sam文件
+
+#用minimap2进行contig和reads之间的比对生成overlap文件
 cd /data2/home/lichunhui/human_stool/02_minimap2
-nohup minimap2 -ax map-ont /public/home/renqingmiao2018/project/yak.rumen.metagenome/00.ref/human.genome/GCF_000001405.38_GRCh38.p12_genomic.fna /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq -t 24 > SRR8427257.sam &
+nohup sh minimap_rr.sh &
 
 #安装nextpolish
 cd software/
@@ -272,7 +273,4 @@ git clone --recursive https://github.com/jts/nanopolish.git
 
 #racon抛光
 cd /data2/home/lichunhui/human_stool/07_racon
-racon -m 8 -x -6 -g -8 -t 12 \
-/data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq \
-/data2/home/lichunhui/human_stool/02_minimap2/SRR8427257.sam \
-/data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta
+racon -m 8 -x -6 -g -8 -t 12 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq /data2/home/lichunhui/human_stool/02_minimap2/ovlp2.sam /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta > canu_100mcontig_racon.fasta
