@@ -273,4 +273,19 @@ git clone --recursive https://github.com/jts/nanopolish.git
 
 #racon抛光
 cd /data2/home/lichunhui/human_stool/07_racon
-racon -m 8 -x -6 -g -8 -t 12 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq /data2/home/lichunhui/human_stool/02_minimap2/ovlp2.sam /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta > canu_100mcontig_racon.fasta
+racon -m 8 -x -6 -g -8 -t 24 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq /data2/home/lichunhui/human_stool/02_minimap2/ovlp2.sam /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon.fasta > canu_100mcontig_racon1.fasta
+
+racon -m 8 -x -6 -g -8 -t 24 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq /data2/home/lichunhui/human_stool/02_minimap2/racon1.sam /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon.fasta > canu_100mcontig_racon2.fasta
+
+cd /data2/home/lichunhui/human_stool/02_minimap2
+minimap2 -ax ava-ont /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon2.fasta /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq -t 24 -o racon2.sam
+
+racon -m 8 -x -6 -g -8 -t 24 /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq /data2/home/lichunhui/human_stool/02_minimap2/racon2.sam /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon2.fasta > canu_100mcontig_racon3.fasta
+
+cd /data2/home/lichunhui/human_stool/02_minimap2
+minimap2 -ax ava-ont /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon3.fasta /data2/home/lichunhui/human_stool/02_minimap2/SRR8427257_meta1.fastq -t 24 -o racon3.sam
+
+
+
+#用metaquast对组装后的contig进行评估
+python /public/home/lichunhui/software/quast/metaquast.py -o /data2/home/lichunhui/human_stool/canu100m_metaquast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta
