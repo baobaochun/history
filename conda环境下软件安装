@@ -1,0 +1,28 @@
+#安装miniconda3
+cd /public/home/lichunhui/software
+wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
+
+#在python=3.7的conda环境中安装软件包
+conda create -n 'python3' python='3.7'
+conda install samtools
+conda install bwa
+conda install bedtools
+conda install megahit
+conda install prodigal
+conda install cd-hit
+conda install diamond
+conda install canu
+conda install flye
+conda install nanofilt
+conda install minimap2
+conda install quickmerge
+conda install racon
+
+
+#在python=2.7的conda环境中安装软件包
+conda create -n 'python2' python='2.7'
+conda config --add channels ursky
+conda install -y -c ursky metawrap-mg
+# To fix the CONCOCT endless warning messages in metaWRAP=1.2+, run
+conda install -y blas=2.5=mkl

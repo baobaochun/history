@@ -289,3 +289,25 @@ minimap2 -ax ava-ont /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_
 
 #用metaquast对组装后的contig进行评估
 python /public/home/lichunhui/software/quast/metaquast.py -o /data2/home/lichunhui/human_stool/canu100m_metaquast /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_canu_100m/SRR8427257.contigs.fasta
+
+
+
+#2020/8/13
+#用metabat2进行分箱
+#用bam文件生成contig深度文件
+cd /data2/home/lichunhui/human_stool/08_metabat_bin
+
+samtools view -bS /data2/home/lichunhui/human_stool/02_minimap2/racon3.sam > /data2/home/lichunhui/human_stool/08_metabat_bin/racon3.bam
+samtools sort -@ 16 -l 9 racon3.bam -o racon3_sort.bam
+jgi_summarize_bam_contig_depths --outputDepth depth.txt racon3_sort.bam
+#分箱
+metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon3.fasta -a depth.txt -o canu_100mcontig_racon3 -v
+#前面的分箱步骤生成的depth.txt文件有问题
+metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_racon3.fasta -o canu_100mcontig_racon3 -v
+
+#checkm查看分箱质量
+checkm lineage_wf -t 24 -x fa -f /data2/home/lichunhui/human_stool/09_checkm_result/result.txt /data2/home/lichunhui/human_stool/08_metabat_bin /data2/home/lichunhui/human_stool/09_checkm_result/
+
+
+NanoFilt /data2/home/lichunhui/human_stool/SRR8427257/SRR8427257.fastq -l 1000 -q 8 --headcrop 40 > /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq
+
