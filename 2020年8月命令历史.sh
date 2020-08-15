@@ -309,5 +309,7 @@ metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/canu_100mcontig_rac
 checkm lineage_wf -t 24 -x fa -f /data2/home/lichunhui/human_stool/09_checkm_result/result.txt /data2/home/lichunhui/human_stool/08_metabat_bin /data2/home/lichunhui/human_stool/09_checkm_result/
 
 
-NanoFilt /data2/home/lichunhui/human_stool/SRR8427257/SRR8427257.fastq -l 1000 -q 8 --headcrop 40 > /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427257_nanofilt.fastq
+gunzip -c reads.fastq.gz | NanoFilt -q 10 -l 500 --headcrop 50 | minimap2 genome.fa - | samtools sort -O BAM -@24 -o alignment.bam -
 
+/public/home/lichunhui/software/circos-0.69-9/bin/circos -module | grep 'missing' | awk '{a=a" "$2;}END{print "cpanm"a}'
+/public/home/lichunhui/software/circos-0.69-9/bin/circos -module | grep 'missing' | awk '{a=a" "$2;}END{system("cpanm"a);}'
