@@ -24,5 +24,3 @@ conda install racon
 conda create -n 'python2' python='2.7'
 conda config --add channels ursky
 conda install -y -c ursky metawrap-mg
-# To fix the CONCOCT endless warning messages in metaWRAP=1.2+, run
-conda install -y blas=2.5=mkl

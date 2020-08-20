@@ -315,3 +315,5 @@ gunzip -c reads.fastq.gz | NanoFilt -q 10 -l 500 --headcrop 50 | minimap2 genome
 /public/home/lichunhui/software/circos-0.69-9/bin/circos -module | grep 'missing' | awk '{a=a" "$2;}END{system("cpanm"a);}'
 
 python /public/home/lichunhui/script/kraken2_anno_num.py /data2/home/lichunhui/human_stool/03_read_kraken2/ /data2/home/lichunhui/human_stool/03_read_kraken2/test/
+
+metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/total_racon.fasta -o /data2/home/lichunhui/human_stool/08_metabat_bin/total_bin/total_merge -v
