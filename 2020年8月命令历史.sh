@@ -317,3 +317,22 @@ gunzip -c reads.fastq.gz | NanoFilt -q 10 -l 500 --headcrop 50 | minimap2 genome
 python /public/home/lichunhui/script/kraken2_anno_num.py /data2/home/lichunhui/human_stool/03_read_kraken2/ /data2/home/lichunhui/human_stool/03_read_kraken2/test/
 
 metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/total_racon.fasta -o /data2/home/lichunhui/human_stool/08_metabat_bin/total_bin/total_merge -v
+
+
+SRR8427256_merge.23
+/data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa
+SRR8427257_merge.16
+SRR8427257_merge.2
+/data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427257_bin/SRR8427257_merge.6.fa
+SRR8427257_merge.18
+SRR8427257_merge.13
+/data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427258_bin/SRR8427258_merge.26.fa
+SRR8427258_merge.24
+SRR8427258_merge.18
+SRR8427258_merge.27
+SRR8427258_merge.25
+
+grep 'merge' summary.txt | sed 's/^  //' | awk '{print $1,$2,$13,$14}' | sed 's/\ /\t/g' > test.txt
+
+
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/makeblastdb -in /data2/home/lichunhui/database/nr/nr -dbtype prot -out nr_blastdb -parse_seqids
