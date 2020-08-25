@@ -335,4 +335,36 @@ SRR8427258_merge.25
 grep 'merge' summary.txt | sed 's/^  //' | awk '{print $1,$2,$13,$14}' | sed 's/\ /\t/g' > test.txt
 
 
-/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/makeblastdb -in /data2/home/lichunhui/database/nr/nr -dbtype prot -out nr_blastdb -parse_seqids
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/makeblastdb -in nt -dbtype nucl -out nt_blastdb -parse_seqids
+
+blastn -query seq.fasta -out seq.blast -db dbname -outfmt 6 -evalue 1e-5 -num_threads 4
+
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427256_merge.16.blast -outfmt 6 -evalue 1e-5 -num_threads 12
+
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427257_bin/SRR8427257_merge.6.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427257_merge.6.blast -outfmt 6 -evalue 1e-5 -num_threads 12
+
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427258_bin/SRR8427258_merge.26.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427258_merge.26.blast -outfmt 6 -evalue 1e-5 -num_threads 12
+
+
+/public/home/lichunhui/lastz-distrib/bin/lastz /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa --step=10 --seed=match12 --notransition --exact=20 --noytrim --match=1,5 --ambiguous=n --coverage=90 --identity=95 --format=text > AP019004.1_vs_SRR8427256_merge.16.txt
+
+
+minimap2 -ax asm20 /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa > aln.sam
+
+/public/home/lichunhui/software/MUMmer3.23/nucmer --prefix=SRR8427256 /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa
+/public/home/lichunhui/software/MUMmer3.23/show-coords -r SRR8427256.delta > SRR8427256.coords
+grep -E 'tig' SRR8427256.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427256_startend.txt
+
+/public/home/lichunhui/software/MUMmer3.23/nucmer --prefix=SRR8427257 /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427257_bin/SRR8427257_merge.6.fa
+/public/home/lichunhui/software/MUMmer3.23/show-coords -r SRR8427257.delta > SRR8427257.coords
+grep -E 'tig' SRR8427257.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427257_startend.txt
+
+/public/home/lichunhui/software/MUMmer3.23/nucmer --prefix=SRR8427258 /data2/home/lichunhui/human_stool/10_blastn/LT996885.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427258_bin/SRR8427258_merge.26.fa
+/public/home/lichunhui/software/MUMmer3.23/show-coords -r SRR8427258.delta > SRR8427258.coords
+grep -E 'tig' SRR8427258.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427258_startend.txt
+
+
+awk '{print $2}' SRR8427256_merge.16.blast | uniq
+
+
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427256_merge.16.blastn -outfmt 1 -evalue 1e-5 -num_threads 20
