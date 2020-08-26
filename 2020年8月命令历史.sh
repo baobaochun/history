@@ -321,11 +321,13 @@ metabat2 -t 24 -i /data2/home/lichunhui/human_stool/07_racon/total_racon.fasta -
 
 SRR8427256_merge.23
 /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa
+
 SRR8427257_merge.16
 SRR8427257_merge.2
 /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427257_bin/SRR8427257_merge.6.fa
 SRR8427257_merge.18
 SRR8427257_merge.13
+
 /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427258_bin/SRR8427258_merge.26.fa
 SRR8427258_merge.24
 SRR8427258_merge.18
@@ -369,5 +371,9 @@ awk '{print $2}' SRR8427256_merge.16.blast | uniq
 
 /public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427256_merge.16.blastn -outfmt 3 -evalue 1e-5 -num_threads 20
 
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.23.fa -db /data2/home/lichunhui/database/NCBI/nt_blastdb -out /data2/home/lichunhui/human_stool/10_blastn/SRR8427256_merge.23.blastn -outfmt "7 qseqid sseqid evalue bitscore" -evalue 1e-5 -num_threads 20
+
 
 minimap2 -ax map-ont /public/home/renqingmiao2018/project/yak.rumen.metagenome/00.ref/human.genome/GCF_000001405.38_GRCh38.p12_genomic.fna /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427256_qc.fastq -t 24 | samtools view -bS -@ 24 | samtools view -bu -f 4 -@ 24 | samtools sort -@ 24 -m 2G -o /data2/home/lichunhui/human_stool/02_minimap2/SRR8427256_unmap_sort.bam
+
+/public/home/lichunhui/software/EMBOSS-6.6.0/emboss/transeq -sequence /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.23.fa -outseq ~/protein_23.fa -table 11
