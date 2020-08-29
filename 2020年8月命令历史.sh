@@ -377,3 +377,8 @@ awk '{print $2}' SRR8427256_merge.16.blast | uniq
 minimap2 -ax map-ont /public/home/renqingmiao2018/project/yak.rumen.metagenome/00.ref/human.genome/GCF_000001405.38_GRCh38.p12_genomic.fna /data2/home/lichunhui/human_stool/01_nanofilt/SRR8427256_qc.fastq -t 24 | samtools view -bS -@ 24 | samtools view -bu -f 4 -@ 24 | samtools sort -@ 24 -m 2G -o /data2/home/lichunhui/human_stool/02_minimap2/SRR8427256_unmap_sort.bam
 
 /public/home/lichunhui/software/EMBOSS-6.6.0/emboss/transeq -sequence /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.23.fa -outseq ~/protein_23.fa -table 11
+
+
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye100m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_flye100m/SRR8427256.contig.flye100m.fasta
+
+python /public/home/lichunhui/software/quast/quast.py -o /data2/home/lichunhui/human_stool/04_assemble/flye250m_quast /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_flye250m/SRR8427256.contig.flye250m.fasta
