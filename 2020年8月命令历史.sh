@@ -400,3 +400,33 @@ awk '{print $1,$2}' SRR8427256_cazy.m8 | sed 's/\s[0-9A-Za-z\.]*/\t/' | sed 's/|
 awk '{print $1,$2}' SRR8427256_cazy.m8 | sed 's/\s[0-9A-Za-z\.]*/\t/' > cazy_summary.csv
 
 conda activate phylophlan
+
+phylophlan -i /data2/home/lichunhui/human_stool/08_metabat_bin/total_bin/ -d phylophlan --diversity medium -o /data2/home/lichunhui/human_stool/phylophlan_tree/ -f /public/home/lichunhui/software/supermatrix_aa.cfg
+
+/public/home/lichunhui/software/phylophlan/phylophlan/phylophlan.py -i /data2/home/lichunhui/human_stool/08_metabat_bin/medium_bin/ --genome_extension .fa -d phylophlan --diversity medium -o /data2/home/lichunhui/human_stool/phylophlan_tree/ -f /public/home/lichunhui/software/supermatrix_aa.cfg
+
+nohup sh download_hungate.sh &
+
+#~/software/miniconda3/envs/python3/bin/minimap2
+#~/software/miniconda3/envs/python3/bin/samtools
+#质控后序列所在路径
+inpath='/data2/home/lichunhui/human_stool/01_nanofilt'
+#输出bam文件路径
+outpath='/data2/home/lichunhui/human_stool/02_minimap2'
+#参考序列路径
+indexpath='/public/home/renqingmiao2018/project/yak.rumen.metagenome/00.ref/human.genome/GCF_000001405.38_GRCh38.p12_genomic.fna'
+
+for i in ${inpath}/*_qc.fastq
+do
+echo $i
+base=$(basename $i _qc.fastq)
+echo $base
+minimap2 -ax map-ont ${indexpath} $i -t 24 | samtools view -bS -@ 12 | samtools view -bu -f 4 -@ 12 | samtools sort -@ 12 -m 2G -o ${outpath}/${base}_unmap_sort.bam
+wait
+done
+
+
+cd-hit-est -i total.orf.fasta -o cdhit.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9
+
+
+/public/home/lichunhui/software/quast/quast.py -o test.file /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_merge/merged_SRR8427256.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_merge/merged_SRR8427257.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427258_merge/merged_SRR8427258.fasta
