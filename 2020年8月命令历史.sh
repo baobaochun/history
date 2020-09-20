@@ -430,3 +430,12 @@ cd-hit-est -i total.orf.fasta -o cdhit.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 
 
 
 /public/home/lichunhui/software/quast/quast.py -o test.file /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_merge/merged_SRR8427256.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_merge/merged_SRR8427257.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427258_merge/merged_SRR8427258.fasta
+
+/public/home/lichunhui/software/quast/metaquast.py -o metaquast_file /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_merge/merged_SRR8427256.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427257_merge/merged_SRR8427257.fasta /data2/home/lichunhui/human_stool/04_assemble/SRR8427258_merge/merged_SRR8427258.fasta
+
+/public/home/lichunhui/software/quast/metaquast.py -o metaquast_test /data2/home/lichunhui/human_stool/04_assemble/SRR8427256_merge/merged_SRR8427256.fasta
+
+minimap2 -ax ava-ont /data2/home/lichunhui/human_stool/07_racon/SRR8427256_racon2.fasta /data2/home/lichunhui/human_stool/02_minimap2/SRR8427256_meta.fastq -t 30 | samtools view -bS -@ 20 > /data2/home/lichunhui/human_stool/07_racon/SRR8427256_racon3.bam
+
+
+medaka consensus --threads 20 /public/home/lichunhui/ref.fai /data2/home/lichunhui/human_stool/07_racon

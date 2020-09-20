@@ -1,0 +1,47 @@
+#数据到了，于晚上8点左右将数据从硬盘拷贝到新服务器上
+#数据存放路径
+/public/sequencing_data/Rumen_ONT
+
+#readme.txt
+数据使用者：李春晖
+时间：2020/09/16
+数据说明：文件夹WHWLZ-201911127D-01下的数据是奶牛瘤胃宏基因组单个样本的三代ONT和二代Illumina原始数据以及未来组在分析数据过程中产生的中间文件。
+
+#数据拷贝完成，先验证传输数据是否完整，检验每一个.md5文件
+cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20190925-NPL1199-P1-PAE01409/PAE01409/qc_report
+md5sum -c 20190925-NPL1199-P1-PAE01409.md5.txt
+cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20191011-NPL1199-P1-PAE03846/PAE03846/qc_report
+md5sum -c 20191011-NPL1199-P1-PAE03846.md5.txt
+cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20191011-NPL1199-P1-PAE04012/PAE04012/qc_report
+md5sum -c 20191011-NPL1199-P1-PAE04012.md5.txt
+cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20191011-NPL1199-P1-PAE05326/PAE05326/qc_report
+md5sum -c 20191011-NPL1199-P1-PAE05326.md5.txt
+cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/NGS/L3N
+md5sum -c md5.txt
+
+#查看每一项内容，具体的分析细节需要问未来组王年
+
+#在新服务器上安装miniconda3
+cd /public/home/lichunhui/software
+wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+#激活conda环境
+. /public/home/lichunhui/software/miniconda3/bin/activate
+#关闭conda环境
+conda deactivate
+#在conda环境下激活metawrap环境
+conda activate metawrap
+#在conda环境下激活python3环境
+conda activate python3
+
+#使用metaquast对NGS组装数据进行评估
+qsub /public/home/lichunhui/project/rumen_ont/script/metaquast_ngs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/metaquast_tgs.sh
+
+#使用quast对NGS和TGS组装数据进行评估
+qsub /public/home/lichunhui/project/rumen_ont/script/quast_ngs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/quast_tgs.sh
+
+#使用prodigal对~45G的二代和三代数据进行基因预测
+qusb /public/home/lichunhui/project/rumen_ont/script/prodigal_ngs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_tgs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_merge.sh
