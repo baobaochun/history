@@ -45,3 +45,10 @@ qsub /public/home/lichunhui/project/rumen_ont/script/quast_tgs.sh
 qusb /public/home/lichunhui/project/rumen_ont/script/prodigal_ngs.sh
 qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_tgs.sh
 qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_merge.sh
+
+#使用kraken2对~45G和~200G的二代和三代组装结果进行分类注释
+qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45g_ngs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45g_tgs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45G_merge.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_200g_ngs.sh
+qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_200g_tgs.sh
