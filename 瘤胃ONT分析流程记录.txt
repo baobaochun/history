@@ -20,6 +20,16 @@ cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/NGS/L3N
 md5sum -c md5.txt
 
 #查看每一项内容，具体的分析细节需要问未来组王年
+#200G_NGS
+/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
+#200G_TGS
+/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta
+#45G_NGS
+/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta
+#45G_TGS
+/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta
+#45G_merge
+/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
 
 #在新服务器上安装miniconda3
 cd /public/home/lichunhui/software
@@ -33,22 +43,29 @@ conda activate metawrap
 #在conda环境下激活python3环境
 conda activate python3
 
-#使用metaquast对NGS组装数据进行评估
-qsub /public/home/lichunhui/project/rumen_ont/script/metaquast_ngs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/metaquast_tgs.sh
+#使用quast对~200G的NGS和TGS组装数据进行评估
+quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/NGS /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
+quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/TGS /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta
 
-#使用quast对NGS和TGS组装数据进行评估
-qsub /public/home/lichunhui/project/rumen_ont/script/quast_ngs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/quast_tgs.sh
+#使用quast对~45G的NGS和TGS组装数据进行评估
+quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/45G_NGS/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta
+quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/45G_TGS/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta
+quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/merge/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
 
-#使用prodigal对~45G的二代和三代数据进行基因预测
-qusb /public/home/lichunhui/project/rumen_ont/script/prodigal_ngs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_tgs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/prodigal_merge.sh
+#使用prodigal对~45G和~200G的二代和三代数据进行基因预测
 
 #使用kraken2对~45G和~200G的二代和三代组装结果进行分类注释
-qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45g_ngs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45g_tgs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_45G_merge.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_200g_ngs.sh
-qsub /public/home/lichunhui/project/rumen_ont/script/kraken2_200g_tgs.sh
+
+
+#使用cd-hit对预测的基因去冗余
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/TGS
+cd-hit-est -i prodigal_tgs.orf.fasta -o cdhit_tgs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/NGS
+cd-hit-est -i prodigal_ngs.orf.fasta -o cdhit_ngs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/merge
+cd-hit-est -i prodigal_merge.orf.fasta -o cdhit_merge.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+
+#使用diamond在nr数据库中进行基因注释
+qsub /public/home/lichunhui/project/rumen_ont/script/diamond_nr.sh
