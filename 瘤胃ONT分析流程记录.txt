@@ -1,13 +1,7 @@
-#数据到了，于晚上8点左右将数据从硬盘拷贝到新服务器上
 #数据存放路径
 /public/sequencing_data/Rumen_ONT
 
-#readme.txt
-数据使用者：李春晖
-时间：2020/09/16
-数据说明：文件夹WHWLZ-201911127D-01下的数据是奶牛瘤胃宏基因组单个样本的三代ONT和二代Illumina原始数据以及未来组在分析数据过程中产生的中间文件。
-
-#数据拷贝完成，先验证传输数据是否完整，检验每一个.md5文件
+#数据拷贝，拷贝完成后先验证传输数据是否完整，检验每一个.md5文件
 cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20190925-NPL1199-P1-PAE01409/PAE01409/qc_report
 md5sum -c 20190925-NPL1199-P1-PAE01409.md5.txt
 cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20191011-NPL1199-P1-PAE03846/PAE03846/qc_report
@@ -19,18 +13,6 @@ md5sum -c 20191011-NPL1199-P1-PAE05326.md5.txt
 cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/NGS/L3N
 md5sum -c md5.txt
 
-#查看每一项内容，具体的分析细节需要问未来组王年
-#200G_NGS
-/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
-#200G_TGS
-/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta
-#45G_NGS
-/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta
-#45G_TGS
-/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta
-#45G_merge
-/public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
-
 #在新服务器上安装miniconda3
 cd /public/home/lichunhui/software
 wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -40,22 +22,32 @@ wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 conda deactivate
 #在conda环境下激活metawrap环境
 conda activate metawrap
-#在conda环境下激活python3环境
-conda activate python3
+#在conda环境下激活drep环境
+conda activate drep
+#在conda环境下激活eggnog环境
+conda activate eggnog
+#在conda环境下激活diamond环境
+conda activate diamond
+#在conda环境下激活kegg环境
+conda activate kegg
+#在conda环境下激活antismash环境
+conda activate antismash
 
-#使用quast对~200G的NGS和TGS组装数据进行评估
+#使用quast对~200G的NGS和TGS组装数据和~45G的NGS和TGS组装数据进行评估
+#200NGS
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/NGS /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
+#200TGS
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/TGS /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta
-
-#使用quast对~45G的NGS和TGS组装数据进行评估
+#45NGS
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/45G_NGS/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta
+#45TGS
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/45G_TGS/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta
+#45merge
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/merge/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
 
 #使用prodigal对~45G和~200G的二代和三代数据进行基因预测
 
 #使用kraken2对~45G和~200G的二代和三代组装结果进行分类注释
-
 
 #使用cd-hit对预测的基因去冗余
 cd /public/home/lichunhui/project/rumen_ont/04_prodigal/TGS
@@ -67,5 +59,38 @@ cd-hit-est -i prodigal_ngs.orf.fasta -o cdhit_ngs.orf.fasta -n 9 -g 1 -c 0.95 -G
 cd /public/home/lichunhui/project/rumen_ont/04_prodigal/merge
 cd-hit-est -i prodigal_merge.orf.fasta -o cdhit_merge.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
 
+
 #使用diamond在nr数据库中进行基因注释
-qsub /public/home/lichunhui/project/rumen_ont/script/diamond_nr.sh
+
+
+#对diamond_cazy的注释结果进行处理
+awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45tgs.orf.fasta.csv | sed 's/|/\t/g' | awk '{print $1,$5,$2,$3}' > /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45tgs.orf.fasta.txt
+awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45ngs.orf.fasta.csv | sed 's/|/\t/g' | awk '{print $1,$5,$2,$3}' > /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45ngs.orf.fasta.txt
+awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45merge.orf.fasta.csv | sed 's/|/\t/g' | awk '{print $1,$5,$2,$3}' > /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_45merge.orf.fasta.txt
+awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_200ngs.orf.fasta.csv | sed 's/|/\t/g' | awk '{print $1,$5,$2,$3}' > /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_200ngs.orf.fasta.txt
+awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_200tgs.orf.fasta.csv | sed 's/|/\t/g' | awk '{print $1,$5,$2,$3}' > /public/home/lichunhui/project/rumen_ont/08_diamond_cazy/diamond_cazy_200tgs.orf.fasta.txt
+
+#在eggnog数据库中进行注释
+
+#kegg注释
+exec_annotation -o /public/home/lichunhui/project/rumen_ont/11_kegg/prodigal_45tgs.orf.faa.txt -p /public/home/lichunhui/database/kofamscan/profiles -k /public/home/lichunhui/database/kofamscan/ko_list --cpu 5 -E 1e-5 /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs.orf.faa
+
+#本地blastn
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /public/home/lichunhui/project/rumen_ont/07_binstat/200tgs/200tgs_HQ_bin/tgs_bin.1443.fa -db /public/home/lichunhui/database/NCBI/nt_blastdb -out /public/home/lichunhui/project/rumen_ont/10_bin_compare/tgs_bin.1443.fa.blastn -task blastn -outfmt "7 qseqid sseqid evalue bitscore" -evalue 1e-18 -max_target_seqs 5 -num_threads 20
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /public/home/lichunhui/project/rumen_ont/07_binstat/200tgs/200tgs_HQ_bin/tgs_bin.3775.fa -db /public/home/lichunhui/database/NCBI/nt_blastdb -out /public/home/lichunhui/project/rumen_ont/10_bin_compare/tgs_bin.3775.fa.blastn -task blastn -outfmt "7 qseqid sseqid evalue bitscore" -evalue 1e-18 -max_target_seqs 5 -num_threads 20
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /public/home/lichunhui/project/rumen_ont/07_binstat/200ngs/200ngs_MQ_bin/ngs_bin.564.fa -db /public/home/lichunhui/database/NCBI/nt_blastdb -out /public/home/lichunhui/project/rumen_ont/10_bin_compare/ngs_bin.564.fa.blastn -task blastn -outfmt "7 qseqid sseqid evalue bitscore" -evalue 1e-18 -max_target_seqs 5 -num_threads 20
+/public/home/lichunhui/software/ncbi-blast-2.10.1+/bin/blastn -query /public/home/lichunhui/project/rumen_ont/07_binstat/200ngs/200ngs_MQ_bin/ngs_bin.720.fa -db /public/home/lichunhui/database/NCBI/nt_blastdb -out /public/home/lichunhui/project/rumen_ont/10_bin_compare/ngs_bin.720.fa.blastn -task blastn -outfmt "7 qseqid sseqid evalue bitscore" -evalue 1e-18 -max_target_seqs 5 -num_threads 20
+
+
+#使用mummer获得序列比对上参考基因组的位置信息
+/public/home/lichunhui/software/MUMmer3.23/nucmer --prefix=SRR8427256 /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa
+/public/home/lichunhui/software/MUMmer3.23/show-coords -r SRR8427256.delta > SRR8427256.coords
+grep -E 'tig' SRR8427256.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427256_startend.txt
+
+
+#预测16S-rRNA
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_45tgs_contigs.rRNA.gff
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta > barrnap_45ngs_contigs.rRNA.gff
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta > barrnap_45merge_contigs.rRNA.gff
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_200tgs_contigs.rRNA.gff
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta > barrnap_200ngs_contigs.rRNA.gff
