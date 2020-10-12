@@ -94,3 +94,17 @@ barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/res
 barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta > barrnap_45merge_contigs.rRNA.gff
 barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_200tgs_contigs.rRNA.gff
 barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta > barrnap_200ngs_contigs.rRNA.gff
+
+
+
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta | awk '{print $1"\t"length($2)}' > test.txt
+
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta | awk '{print $1"\t"length($5)}' > contig_len_45ngs.txt
+
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta | awk '{print $1"\t"length($2)}' > contig_len_45merge.txt
+
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_45ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45ngs.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_45merge.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45merge.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200ngs.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs.txt
