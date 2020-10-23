@@ -83,9 +83,10 @@ exec_annotation -o /public/home/lichunhui/project/rumen_ont/11_kegg/prodigal_45t
 
 
 #使用mummer获得序列比对上参考基因组的位置信息
-/public/home/lichunhui/software/MUMmer3.23/nucmer --prefix=SRR8427256 /data2/home/lichunhui/human_stool/10_blastn/AP019004.1.fasta /data2/home/lichunhui/human_stool/08_metabat_bin/SRR8427256_bin/SRR8427256_merge.16.fa
-/public/home/lichunhui/software/MUMmer3.23/show-coords -r SRR8427256.delta > SRR8427256.coords
-grep -E 'tig' SRR8427256.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427256_startend.txt
+nucmer /public/home/lichunhui/project/rumen_ont/10_bin_compare/CP011391.1.fasta /public/home/lichunhui/project/rumen_ont/10_bin_compare/tgs_bin.1443.fa
+nucmer /public/home/lichunhui/project/rumen_ont/10_bin_compare/CP011391.1.fasta /public/home/lichunhui/project/rumen_ont/07_binstat/200G_MQbin/ngs_bin.564.fa
+show-coords -r tgs_bin_1443.delta > tgs_bin_1443.coords
+grep -E 'tig' tgs_bin_1443.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427256_startend.txt
 
 
 #预测16S-rRNA
@@ -108,3 +109,16 @@ awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhu
 awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_45merge.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45merge.txt
 awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200ngs.txt
 awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs_polish.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs_polish.txt
+
+
+
+grep -E '16S' barrnap_45ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | less
+grep -E '16S' barrnap_45tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_45merge_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_200tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_200ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+
+#计算平均ORF长度
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_200tgs_polish.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
