@@ -1,5 +1,6 @@
-#数据存放路径
+#原始数据存放路径
 /public/sequencing_data/Rumen_ONT
+
 
 #数据拷贝，拷贝完成后先验证传输数据是否完整，检验每一个.md5文件
 cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopore/L3N/20190925-NPL1199-P1-PAE01409/PAE01409/qc_report
@@ -12,6 +13,7 @@ cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/Nanopor
 md5sum -c 20191011-NPL1199-P1-PAE05326.md5.txt
 cd /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/raw_data/genome/NGS/L3N
 md5sum -c md5.txt
+
 
 #在新服务器上安装miniconda3
 cd /public/home/lichunhui/software
@@ -30,10 +32,12 @@ conda activate eggnog
 conda activate diamond
 #在conda环境下激活kegg环境
 conda activate kegg
-#在conda环境下激活antismash环境
-conda activate antismash
 
-#使用quast对~200G的NGS和TGS组装数据和~45G的NGS和TGS组装数据进行评估
+
+#使用metaquast进行评估，评估结果不理想
+
+
+#使用quast对~200G和~45G的NGS和TGS组装数据进行评估
 #200NGS
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/NGS /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
 #200TGS
@@ -45,19 +49,115 @@ quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/45G_TGS/ /public/s
 #45merge
 quast.py -o /public/home/lichunhui/project/rumen_ont/02_quast/merge/ /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
 
+
 #使用prodigal对~45G和~200G的二代和三代数据进行基因预测
+#45tgs
+prodigal -a /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.orf.faa -i /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/3.ngs_polished/final.polished.fasta -f gff -o /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.gff -p meta -q -d /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.orf.fasta
+#45ngs
+prodigal -a /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_single_45ngs.orf.faa -c -i /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta -f gff -o /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_single_45ngs.gff -p meta -q -d /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_single_45ngs.orf.fasta
+#45merge
+prodigal -a /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_single_merge.orf.faa -i /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta -f gff -o /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_single_merge.gff -p meta -q -d /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_single_merge.orf.fasta
+#200tgs
+prodigal -a /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.orf.faa -i /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/2.polish/final.polished.fasta -f gff -o /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.gff -p meta -q -d /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.orf.fasta
+#200ngs
+prodigal -a /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.faa -i /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta -f gff -o /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.gff -p meta -q -d /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.fasta
 
-#使用kraken2对~45G和~200G的二代和三代组装结果进行分类注释
 
-#使用cd-hit对预测的基因去冗余
-cd /public/home/lichunhui/project/rumen_ont/04_prodigal/TGS
-cd-hit-est -i prodigal_tgs.orf.fasta -o cdhit_tgs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+#得到orf长度
+#45tgs
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs.txt
+#45ngs
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_45ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45ngs.txt
+#45merge
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_45merge.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45merge.txt
+#200ngs
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200ngs.txt
+#200tgs
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs.txt
+#45tgs_polish
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs_polish.txt
+#200tgs_polish
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs_polish.txt
 
-cd /public/home/lichunhui/project/rumen_ont/04_prodigal/NGS
-cd-hit-est -i prodigal_ngs.orf.fasta -o cdhit_ngs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
 
-cd /public/home/lichunhui/project/rumen_ont/04_prodigal/merge
-cd-hit-est -i prodigal_merge.orf.fasta -o cdhit_merge.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+#计算平均ORF长度
+#45tgs
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_45tgs.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#45ngs
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_45ngs.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#45merge
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_45merge.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#200ngs
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_200ngs.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#200tgs
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_200tgs.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#45tgs_polish
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_45tgs_polish.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+#200tgs_polish
+cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_200tgs_polish.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+
+
+#使用cd-hit对预测的ORF去冗余
+#45tgs & 45tgs_polish
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS
+cd-hit-est -i prodigal_45tgs.orf.fasta -o cdhit_45tgs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+cd-hit-est -i prodigal_45tgs_polish.orf.fasta -o cdhit_45tgs_polish.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 30
+#45ngs
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS
+cd-hit-est -i prodigal_45ngs.orf.fasta -o cdhit_45ngs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+#45merge
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge
+cd-hit-est -i prodigal_45merge.orf.fasta -o cdhit_45merge.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 20
+#200tgs & 200tgs_polish
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS
+cd-hit-est -i prodigal_200tgs.orf.fasta -o cdhit_200tgs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 30
+cd-hit-est -i prodigal_200tgs_polish.orf.fasta -o cdhit_200tgs_polish.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 30
+#200ngs
+cd /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS
+cd-hit-est -i prodigal_200ngs.orf.fasta -o cdhit_200ngs.orf.fasta -n 9 -g 1 -c 0.95 -G 0 -M 0 -d 0 -aS 0.9 -T 30
+
+#预测16S-rRNA
+#45tgs
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_45tgs_contigs.rRNA.gff
+#45tgs_polish
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/3.ngs_polished/final.polished.fasta > barrnap_45tgs_polish_contigs.rRNA.gff
+#45ngs
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta > barrnap_45ngs_contigs.rRNA.gff
+#45merge
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta > barrnap_45merge_contigs.rRNA.gff
+#200tgs
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_200tgs_contigs.rRNA.gff
+#200tgs_polish
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/2.polish/final.polished.fasta > barrnap_200tgs_polish_contigs.rRNA.gff
+#200ngs
+barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta > barrnap_200ngs_contigs.rRNA.gff
+
+
+#计算含有两个及以上16S-rRNA拷贝的contig的数量
+grep -E '16S' barrnap_45ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l
+grep -E '16S' barrnap_45tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_45tgs_polish_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_45merge_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_200tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+grep -E '16S' barrnap_200tgs_polish_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l
+grep -E '16S' barrnap_200ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
+
+
+#使用kraken2对~45G和~200G的二代和三代组装结果进行分类注释(基于contig的注释)
+#45tgs
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_tgs.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_tgs.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta
+#45tgs_polish
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_tgs_polish.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_tgs_polish.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/3.ngs_polished/final.polished.fasta
+#45ngs
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_ngs.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_ngs.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta
+#45merge
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_merge.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_45g_merge.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta
+#200tgs
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_tgs.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_tgs.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta
+#200tgs_polish
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_tgs_polish.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_tgs_polish.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/2.polish/final.polished.fasta
+#200ngs
+/public/home/lichunhui/software/kraken2/kraken2 --db /public/home/lichunhui/database/KrakenDB_201809/ --threads 10 --report-zero-counts --output /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_ngs.readinfo --report /public/home/lichunhui/project/rumen_ont/05_kraken2/kraken2_200g_ngs.report /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta
 
 
 #使用diamond在nr数据库中进行基因注释
@@ -73,6 +173,9 @@ awk '{print $1,$3,$11,$2}' /public/home/lichunhui/project/rumen_ont/08_diamond_c
 #在eggnog数据库中进行注释
 
 #kegg注释
+#45tgs
+exec_annotation -o /public/home/lichunhui/project/rumen_ont/11_kegg/prodigal_45tgs.orf.faa.txt -p /public/home/lichunhui/database/kofamscan/profiles -k /public/home/lichunhui/database/kofamscan/ko_list --cpu 40 -E 0.00001 /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs_polish.orf.faa
+#45ngs
 exec_annotation -o /public/home/lichunhui/project/rumen_ont/11_kegg/prodigal_45tgs.orf.faa.txt -p /public/home/lichunhui/database/kofamscan/profiles -k /public/home/lichunhui/database/kofamscan/ko_list --cpu 5 -E 1e-5 /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs.orf.faa
 
 #本地blastn
@@ -83,18 +186,7 @@ exec_annotation -o /public/home/lichunhui/project/rumen_ont/11_kegg/prodigal_45t
 
 
 #使用mummer获得序列比对上参考基因组的位置信息
-nucmer /public/home/lichunhui/project/rumen_ont/10_bin_compare/CP011391.1.fasta /public/home/lichunhui/project/rumen_ont/10_bin_compare/tgs_bin.1443.fa
-nucmer /public/home/lichunhui/project/rumen_ont/10_bin_compare/CP011391.1.fasta /public/home/lichunhui/project/rumen_ont/07_binstat/200G_MQbin/ngs_bin.564.fa
-show-coords -r tgs_bin_1443.delta > tgs_bin_1443.coords
-grep -E 'tig' tgs_bin_1443.coords | awk '{print $1,$2}' | sed 's/\ /\t/g' > SRR8427256_startend.txt
 
-
-#预测16S-rRNA
-barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_45tgs_contigs.rRNA.gff
-barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/NGS/megahit.assembly.fasta > barrnap_45ngs_contigs.rRNA.gff
-barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta > barrnap_45merge_contigs.rRNA.gff
-barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/1.pre_assembly/assembly.fasta > barrnap_200tgs_contigs.rRNA.gff
-barrnap --threads 20 < /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta > barrnap_200ngs_contigs.rRNA.gff
 
 
 
@@ -104,21 +196,8 @@ awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_da
 
 awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/Merged/assembly.fasta | awk '{print $1"\t"length($2)}' > contig_len_45merge.txt
 
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_45tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_NGS/prodigal_45ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45ngs.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_merge/prodigal_45merge.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45merge.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_NGS/prodigal_200ngs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200ngs.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/45G_TGS/prodigal_tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_45tgs_polish.txt
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/home/lichunhui/project/rumen_ont/04_prodigal/200G_TGS/prodigal_200tgs_polish.orf.fasta | awk '{print $1"\t"length($10)}' > orf_len_200tgs_polish.txt
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/Comparison/NGS_vs_TGS/02.Assembly/TGS/3.ngs_polished/final.polished.fasta | awk '{print $1"\t"length($2)}' > contig_len_45tgs_polish.txt
 
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/TGS/2.polish/final.polished.fasta | awk '{print $1"\t"length($2)}' > contig_len_200tgs_polish.txt
 
-
-grep -E '16S' barrnap_45ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | less
-grep -E '16S' barrnap_45tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
-grep -E '16S' barrnap_45merge_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
-grep -E '16S' barrnap_200tgs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
-grep -E '16S' barrnap_200ngs_contigs.rRNA.gff | awk '{print $1}' | sort | uniq -d | wc -l 
-
-#计算平均ORF长度
-cat /public/home/lichunhui/project/rumen_ont/14_len_stat/orf_len_200tgs_polish.txt | awk '{sum+=$2} END {print "avg_len=",sum/NR}'
+awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' /public/sequencing_data/Rumen_ONT/WHWLZ-201911127D-01/result/downstream_analysis_result/03.Assembly/NGS/megahit.assembly.fasta | awk '{print $1"\t"length($5)}' > contig_len_200ngs.txt
