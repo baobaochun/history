@@ -1,0 +1,61 @@
+有参转录组分析
+转录组分析路径：
+/public/home/humingliang/projects/zebrafish_pressure/
+
+骨肉瘤数据路径：
+/public/home/qintao/01project/01regeration/hupengfei
+
+找同源基因流程路径：
+/public/home/xuwenjie/projects/data2/hadalfish/03.trans/rbh
+
+各个物种注释基因组路径，可用的gff命名：*.noStopCodon.gff：
+/public/home/zhuchenglong/database/00.ensembl
+
+蝾螈基因组：
+/public/home/zhuchenglong/database/02.manual/02.axolotl
+
+鹿基因组：
+/public/home/qintao/01project/01regeration/03deer_bulkRNA_new/sikadeer_genome
+
+原始数据路径:
+/public/home/qintao/01project/01regeration/03deer_bulkRNA_new
+
+批量解压,要在原数据文件的用户下进行操作:
+/public/home/lichunhui/project/deer_RNA-seq/gunzip_all.sh
+
+hisat2建参考基因组索引:
+/public/home/humingliang/software/hisat2/hisat2-build -p 20 /public/home/qintao/01project/01regeration/03deer_bulkRNA_new/sikadeer_genome/mhl.final.fa mhl
+
+hisat2比对：
+/public/home/lichunhui/project/deer_RNA-seq/hisat2_all.sh
+#在比对的时候最好就将sam文件转为bam文件，并对bam文件进行排序
+
+StringTie
+
+蝾螈基因组注释
+export PATH=/public/home/humingliang/software/java/jdk-11.0.7/bin:$PATH
+export CLASSPATH=.:/public/home/humingliang/software/java/jdk-11.0.7/lib/dt.jar:/public/home/humingliang/software/java/jdk-11.0.7/lib/tools.jar
+
+/public/home/humingliang/software/gene_function/interpro/interproscan-5.44-79.0/interproscan.sh -dp -cpu 64 -d /public/home/lichunhui/project/deer_RNA-seq/axolotl -i /public/home/lichunhui/project/deer_RNA-seq/axolotl/axolotl.pep -iprlookup -goterms -appl Gene3D,Pfam,SMART,SUPERFAMILY,PRINTS,Coils -f TSV,GFF3,XML -T /public/home/lichunhui/project/deer_RNA-seq/axolotl
+
+
+
+
+蝾螈单细胞数据下载
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445716
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445717
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445718
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445719
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445720
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445721
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445722
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/prefetch -X 100G -O /public/home/lichunhui/project/deer_scrna/axolotl_sample_scrna SRR10445723
+
+将下载下来的sra文件转换为fq文件
+/public/home/lichunhui/software/sratoolkit.2.10.9-centos_linux64/bin/fastq-dump --split-3 SRR10445716.sra
+
+蝾螈功能注释
+perl 00.function.annotation.pl -cutf 20 -Interpro -KEGG -Swissprot -Trembl -Cog -NR -pep /public/home/lichunhui/project/deer_RNA-seq/axolotl/axolotl.pep -nodes node3+node5 -ppn 1
+
+批量删除某用户任务
+qselect -u <username> | xargs qdel
