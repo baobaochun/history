@@ -1,3 +1,21 @@
 许文杰鲍鱼基因组路径：
 /public/home/xuwenjie/project/baoyu
 
+文档中为什么会出现^M？
+原因：在Windows/Dos系统下编辑文字，win/Dos系统会在每一行后面插入一个换行符，即"^M"，十六进制：0x0D0A，与Linux下的换行符十六进制是不一样的，Linux/Unix下是0A(ASCII码)，具体也取决于编译器。
+
+^M，在vim中是特殊控制符，直接打"^M"查找和修改无效。
+解决方案（全局替换）：
+方法一，命令行模式下：% s/ctrl+v，然后再ctrl+m//g
+方法二:，命令行模式下:% s/\r//g
+局部替换：
+命令行模式：n1, n2 s/ctrl+v ctrl+m//g （其中的n1和n2是行号）
+
+#使用perl模块
+export PERL5LIB=$PERL5LIB:/public/home/xuwenjie/perl5/lib/perl5
+
+
+#gff过滤说明
+因为存在可变剪切，所以一个gene下面可能会存在多个mRNA，如果全部保留，可能会对后续找一比一同源步骤产生困扰，因此需要过滤一下gff，只保留gene下最长的mRNA
+
+在过滤完成得到gff.clean后，需要使用脚本gff
