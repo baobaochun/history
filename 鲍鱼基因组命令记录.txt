@@ -1,5 +1,12 @@
-许文杰鲍鱼基因组路径：
+#许文杰鲍鱼基因组路径：
 /public/home/xuwenjie/project/baoyu
+
+#腹足纲有注释的基因组：
+/public/home/xuwenjie/project/baoyu/02.download/02.Gastropoda
+
+#自己的鲍鱼数据路径
+/public/home/xuwenjie/project/baoyu/01.gff/02.gff
+
 
 文档中为什么会出现^M？
 原因：在Windows/Dos系统下编辑文字，win/Dos系统会在每一行后面插入一个换行符，即"^M"，十六进制：0x0D0A，与Linux下的换行符十六进制是不一样的，Linux/Unix下是0A(ASCII码)，具体也取决于编译器。
@@ -16,6 +23,22 @@ export PERL5LIB=$PERL5LIB:/public/home/xuwenjie/perl5/lib/perl5
 
 
 #gff过滤说明
-因为存在可变剪切，所以一个gene下面可能会存在多个mRNA，如果全部保留，可能会对后续找一比一同源步骤产生困扰，因此需要过滤一下gff，只保留gene下最长的mRNA
+因为存在可变剪切，所以一个gene下面可能会存在多个mRNA，如果全部保留，可能会对后续找一比一同源步骤产生困扰，因此需要过滤一下gff，只保留gene下最长的mRNA；
+在过滤完成得到gff.clean后，需要使用脚本gff2cds.pl，利用gff.clean从fasta文件中提取出cds和pep，用于后续的评估；
+用脚本busco4_pep.sh跑蛋白集的BUSCO，用的是后生动物的BUSCO库，检查下载下来的每个鲍鱼数据集的BUSCO达到多少，不合适的数据集就筛掉。
 
-在过滤完成得到gff.clean后，需要使用脚本gff
+#常用命令
+awk '{print $3}' L.gi.gff | grep 'gene' | wc -l
+
+#rbh流程路径
+/public/home/xuwenjie/project/hadalfish/09.CNE/03.protein/01.rbh
+
+#同源建树流程路径
+/public/home/xuwenjie/project/hadalfish/06.genefamily/02.single
+
+#orthofinder基因家族聚类流程路径
+/public/home/xuwenjie/project/hadalfish/06.genefamily/01.orthofinder
+
+#受选择分析
+/public/home/xuwenjie/project/hadalfish/06.genefamily/03.paml
+/public/home/xuwenjie/project/hadalfish/06.genefamily/07.hyphy
