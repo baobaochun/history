@@ -27,8 +27,6 @@ export PERL5LIB=$PERL5LIB:/public/home/xuwenjie/perl5/lib/perl5
 在过滤完成得到gff.clean后，需要使用脚本gff2cds.pl，利用gff.clean从fasta文件中提取出cds和pep，用于后续的评估；
 用脚本busco4_pep.sh跑蛋白集的BUSCO，用的是后生动物的BUSCO库，检查下载下来的每个鲍鱼数据集的BUSCO达到多少，不合适的数据集就筛掉。
 
-#常用命令
-awk '{print $3}' L.gi.gff | grep 'gene' | wc -l
 
 #rbh流程路径
 /public/home/xuwenjie/project/hadalfish/09.CNE/03.protein/01.rbh
@@ -46,5 +44,28 @@ awk '{print $3}' L.gi.gff | grep 'gene' | wc -l
 source /public/software/profile.d/compiler_gnu-7.2.0.sh
 
 
-#自己的鲍鱼的功能注释
+#自己的鲍鱼的功能注释，需要把蛋白质序列中的*去掉
 perl 00.function.annotation.pl -cutf 10 -Interpro -KEGG -Swissprot -Trembl -Cog -NR -pep blackfoot.v1.pep -nodes node1+node2+node3+node6+node7+node8 -ppn 10
+
+#NR库比对
+/public/home/xuwenjie/project/hadalfish/00.data/03.new_data/hadalfish/02.name_NR
+
+
+#GO富集/KEGG富集
+/public/home/xuwenjie/project/lungfish/03.mouse_ovary/06.rpkm/cafe_result/GO
+/public/home/xuwenjie/project/lungfish/03.mouse_ovary/06.rpkm/06.new_lungfish/08.filter_work/kegg
+
+#确认物种树
+/public/home/fengchenguang/data2/projects/01.EastAsiaCyprinidae/05.genetree/08.no_recombin/05.speciestree
+
+
+perl /public/home/lichunhui/build_pbs.pl --in 01.raxml.pl.sh --outdir raxml.sh.pbs --jobname raxml --nodes node1+node2+node3+node4+node6 --cpu 5 --maxnum 50
+
+
+/public/home/xuwenjie/project/hadalfish/06.genefamily/04.time
+分化时间
+
+/public/home/xuwenjie/projects/data2/hadalfish/05.genefamily/08.cafe
+小服务器，Cafe流程
+/public/home/xuwenjie/project/hadalfish/06.genefamily/05.cafe/03.dup
+新服务器，直接看数目
