@@ -33,6 +33,8 @@ conda activate diamond
 #在conda环境下激活kegg环境
 conda activate kegg
 
+/public/home/lichunhui/software/miniconda3/bin/python3.8
+
 
 #使用metaquast进行评估，评估结果不理想
 
